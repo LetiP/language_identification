@@ -15,7 +15,8 @@ MEMORY = Memory(cachedir=CACHE_PATH)
 
 @MEMORY.cache(verbose=0)
 def load_model():
-    corpus = pd.read_csv('lang_ident/sentences.csv', sep='\t', names=[
+    path = join(sys.path[0], 'lang_ident', 'sentences.csv')
+    corpus = pd.read_csv(path, sep='\t', names=[
         'idx', 'lang', 'sentence'])[['lang', 'sentence']]
 
     corpus = corpus[corpus['lang'].isin(
