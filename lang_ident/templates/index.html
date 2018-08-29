@@ -1,0 +1,22 @@
+ {% extends 'layout.html' %} {% block content %}
+
+<div class="py-5 text-center mypage">
+  <h2>Welcome to the Language Identificator!</h2>
+  <p class="lead">Google is better.</p>
+  <div class="text-center">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Language sample</span>
+        </div>
+        <textarea id='text_sample' class="form-control" aria-label="Language Sample"></textarea>
+        <div class="input-group-append">
+          <button id='find_out' class="btn btn-outline-secondary" type="button">Find out!</button>
+          <span id='inferred_lan' style="display:none;" class="input-group-text">?</span>
+        </div>
+      </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
