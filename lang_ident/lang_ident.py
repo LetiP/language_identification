@@ -5,6 +5,7 @@ import concurrent.futures
 from joblib import Memory
 from os.path import expanduser, join as path_join, isfile
 from subprocess import call
+import sys
 
 import time
 
@@ -15,7 +16,7 @@ MEMORY = Memory(cachedir=CACHE_PATH)
 
 @MEMORY.cache(verbose=0)
 def load_model():
-    path = join(sys.path[0], 'lang_ident', 'sentences.csv')
+    path = path_join(sys.path[0], 'lang_ident', 'sentences.csv')
     corpus = pd.read_csv(path, sep='\t', names=[
         'idx', 'lang', 'sentence'])[['lang', 'sentence']]
 
