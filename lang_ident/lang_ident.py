@@ -57,6 +57,7 @@ def mutual_info(word, word_prior, lang, lang_priors=LANG_PRIORS, corpus=CORPUS):
     n = spec.shape[0]
     m = lang_priors[lang]
     if n > 0:
+        # compute the joint probabiblity for word and language
         joint = corpus[spec]['sentence'].str.count(word).sum() / spec.shape[0]
     else:
         return 0
@@ -72,6 +73,7 @@ def word_ident(words, lang_priors=LANG_PRIORS, corpus=CORPUS):
     word_res = {}
     for word in words:
         N = corpus.shape[0]
+        # compute the prior probability for the specific word
         word_prior = corpus['sentence'].str.count(word).sum() / N
 
         res = {}
@@ -104,6 +106,7 @@ def identify(sentence, lang_priors=LANG_PRIORS, corpus=CORPUS):
             if len(words) > 0:
                 jobs.append(executor.submit(
                     word_ident, words, lang_priors, corpus))
+        # merge the results from every core
         for job in concurrent.futures.as_completed(jobs):
             key, value = job.result()
             test_res = sum_to_dict(test_res, key, value)
