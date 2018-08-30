@@ -28,7 +28,7 @@ def load_corpus(dummy_cache=0):
         ['deu', 'eng', 'ron', 'swe', 'fra', 'tur', 'rus', 'ita', 'spa', 'pol'])]
 
     # make dataset smaller by taking only 1/4th of it
-    drop_indices = np.random.choice(corpus.index, corpus.shape[0]//4*3, replace=False)
+    drop_indices = np.random.choice(corpus.index, corpus.shape[0]//7*6, replace=False)
     corpus = corpus.drop(drop_indices)
 
     def language_priors(corpus):
