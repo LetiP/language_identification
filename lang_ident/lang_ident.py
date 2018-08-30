@@ -91,9 +91,7 @@ def word_ident(words, lang_priors=LANG_PRIORS, corpus=CORPUS):
 
         word_res = sum_to_dict(word_res, found, res[found])
 
-    found = max(word_res, key=word_res.get)
-
-    return found, word_res[found]
+    return word_res
 
 
 def identify(sentence, lang_priors=LANG_PRIORS, corpus=CORPUS):
@@ -115,19 +113,20 @@ def identify(sentence, lang_priors=LANG_PRIORS, corpus=CORPUS):
                     word_ident, words, lang_priors, corpus))
         # merge the results from every core
         for job in concurrent.futures.as_completed(jobs):
-            key, value = job.result()
-            test_res = sum_to_dict(test_res, key, value)
-
+            word_res = job.result()
+            for key in word_res:
+                test_res = sum_to_dict(test_res, key, word_res[key])
+    
     return max(test_res, key=test_res.get)
 
 def test():
+    """ Measure the accuracy of the method. """
     print('test shape is', TEST_DATA.shape[0])
     right = 0
-    for idx, row in TEST_DATA.iterrows():
+    for _, row in TEST_DATA.iterrows():
         lang = row['lang']
         sentence = row['sentence']
-        print(lang, sentence)
-        found = identify(sentence)
+        found = identify(sentence.strip('?!,.').split(' '))
         print(found, lang)
         if found == lang:
             right += 1
