@@ -19,16 +19,21 @@ def load_corpus(dummy_cache=0):
     """ Load the corpus into memory. Cached when calling it the second time on the same computer.
     The 'dummy_cache' variable stays only for the purpose of caching when there is the same function parameter.
     Does not work with no parameters. """
-    path = path_join(sys.path[0], 'lang_ident', 'sentences.csv')
+    if __name__ == "__main__":
+        path = path_join(sys.path[0], 'sentences.csv')
+    else:
+        path = path_join(sys.path[0], 'lang_ident', 'sentences.csv')
     corpus = pd.read_csv(path, sep='\t', names=[
         'idx', 'lang', 'sentence'])[['lang', 'sentence']]
 
     # make the dataset smaller my restricting languages
     corpus = corpus[corpus['lang'].isin(
-        ['deu', 'eng', 'ron', 'swe', 'fra', 'tur', 'rus', 'ita', 'spa', 'pol'])]
+        ['deu', 'eng', 'ron', 'swe', 'fra', 'tur', 'ita', 'spa', 'pol'])]
 
     # make dataset smaller by taking only 1/4th of it
     drop_indices = np.random.choice(corpus.index, corpus.shape[0]//7*6, replace=False)
+    test_indices = np.random.choice(drop_indices, len(drop_indices)//6000, replace=False)
+    test_data = corpus.loc[test_indices]
     corpus = corpus.drop(drop_indices)
 
     def language_priors(corpus):
@@ -37,10 +42,12 @@ def load_corpus(dummy_cache=0):
 
     lang_priors = language_priors(corpus)
 
-    return corpus, lang_priors
 
 
-CORPUS, LANG_PRIORS = load_corpus()
+    return corpus, lang_priors, test_data
+
+
+CORPUS, LANG_PRIORS, TEST_DATA = load_corpus()
 
 def sum_to_dict(d, key, value):
     """ Helper function to sum value of existing keys in dict. """
@@ -112,3 +119,20 @@ def identify(sentence, lang_priors=LANG_PRIORS, corpus=CORPUS):
             test_res = sum_to_dict(test_res, key, value)
 
     return max(test_res, key=test_res.get)
+
+def test():
+    print('test shape is', TEST_DATA.shape[0])
+    right = 0
+    for idx, row in TEST_DATA.iterrows():
+        lang = row['lang']
+        sentence = row['sentence']
+        print(lang, sentence)
+        found = identify(sentence)
+        print(found, lang)
+        if found == lang:
+            right += 1
+
+    print('Accuracy is', right/TEST_DATA.shape[0])
+
+if __name__ == "__main__":
+    test()
