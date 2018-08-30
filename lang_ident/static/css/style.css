@@ -687,6 +687,11 @@ fieldset[disabled] .btn-default.switch:hover {
     margin: 2%;
 }
 
+.language {
+    margin: 0 auto;
+    width: 40%;
+}
+
 
 /* Loading screen */
 .loading-overlay,

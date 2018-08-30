@@ -13,7 +13,19 @@ $(document).ready(function () {
             success: function (response) {
                 var response = JSON.parse(response);
                 console.log(response);
-                $('#inferred_lan').text(response['language']);
+                var map = {
+                    'deu': 'Deutsch',
+                    'eng': 'English',
+                    'ron': 'Română',
+                    'swe': 'Swedish',
+                    'fra': 'Français',
+                    'tur': 'Turkish',
+                    'rus': 'Russian',
+                    'ita': 'Italian',
+                    'spa': 'Spanish',
+                    'pol': 'Polski'
+                }
+                $('#inferred_lan').text(map[response['language']]);
                 $('.loading-overlay').fadeOut();
                 $('#inferred_lan').fadeIn();
             }
