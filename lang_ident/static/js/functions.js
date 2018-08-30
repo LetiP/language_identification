@@ -20,7 +20,6 @@ $(document).ready(function () {
                     'swe': 'Swedish',
                     'fra': 'Français',
                     'tur': 'Turkish',
-                    'rus': 'Russian',
                     'ita': 'Italian',
                     'spa': 'Spanish',
                     'pol': 'Polski'
