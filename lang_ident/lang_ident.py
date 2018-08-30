@@ -14,16 +14,25 @@ call("mkdir -p {}".format(CACHE_PATH), shell=True)
 MEMORY = Memory(cachedir=CACHE_PATH)
 
 
-@MEMORY.cache(verbose=0)
-def load_model():
+@MEMORY.cache(verbose=True)
+def load_corpus(dummy_cache=0):
+    """ Load the corpus into memory. Cached when calling it the second time on the same computer.
+    The 'dummy_cache' variable stays only for the purpose of caching when there is the same function parameter.
+    Does not work with no parameters. """
     path = path_join(sys.path[0], 'lang_ident', 'sentences.csv')
     corpus = pd.read_csv(path, sep='\t', names=[
         'idx', 'lang', 'sentence'])[['lang', 'sentence']]
 
+    # make the dataset smaller my restricting languages
     corpus = corpus[corpus['lang'].isin(
         ['deu', 'eng', 'ron', 'swe', 'fra', 'tur', 'rus', 'ita', 'spa', 'pol'])]
 
+    # make dataset smaller by taking only 1/4th of it
+    drop_indices = np.random.choice(corpus.index, corpus.shape[0]//4*3, replace=False)
+    corpus = corpus.drop(drop_indices)
+
     def language_priors(corpus):
+        """ Precompute the priors for the language. Same for every word."""
         return corpus['lang'].value_counts(normalize=True)
 
     lang_priors = language_priors(corpus)
@@ -31,9 +40,10 @@ def load_model():
     return corpus, lang_priors
 
 
-CORPUS, LANG_PRIORS = load_model()
+CORPUS, LANG_PRIORS = load_corpus()
 
 def sum_to_dict(d, key, value):
+    """ Helper function to sum value of existing keys in dict. """
     if key not in d:
         d[key] = value
     else:
@@ -42,6 +52,7 @@ def sum_to_dict(d, key, value):
 
 
 def mutual_info(word, word_prior, lang, lang_priors=LANG_PRIORS, corpus=CORPUS):
+    """ Compute the pointwise mutual information (PMI) for a word to the given language."""
     spec = corpus['lang'] == lang
     n = spec.shape[0]
     m = lang_priors[lang]
@@ -57,6 +68,7 @@ def mutual_info(word, word_prior, lang, lang_priors=LANG_PRIORS, corpus=CORPUS):
 
 
 def word_ident(words, lang_priors=LANG_PRIORS, corpus=CORPUS):
+    """ Determine the language identity of each word by taking the maximum PMI."""
     word_res = {}
     for word in words:
         N = corpus.shape[0]
@@ -76,19 +88,20 @@ def word_ident(words, lang_priors=LANG_PRIORS, corpus=CORPUS):
 
 
 def identify(sentence, lang_priors=LANG_PRIORS, corpus=CORPUS):
-    n_worker = 2
+    """ Determine the language identity for the whole sentence. Parallelized."""
+    n_worker = 4
     test_res = {}
     n = len(sentence) // n_worker
     ExecutorType = concurrent.futures.ProcessPoolExecutor
     with ExecutorType(max_workers=n_worker) as executor:
         jobs = []
         for i in range(n_worker):
+            # split up the sentence in n_worker lists to parallelize computation on cores
             if i < n_worker - 1:
                 words = sentence[i * n:(i + 1) * n]
             else:
                 words = sentence[i * n:]
             if len(words) > 0:
-                print(words)
                 jobs.append(executor.submit(
                     word_ident, words, lang_priors, corpus))
         for job in concurrent.futures.as_completed(jobs):

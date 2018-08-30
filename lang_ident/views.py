@@ -26,6 +26,7 @@ def home():
 
 @APP.route('/identifyLang', methods=['POST'])
 def identifyLang():
+    """ Identify the language for the input text."""
     # parse text
     txt = request.json['txt'].strip('?!,.')
     txt = txt.split(' ')
