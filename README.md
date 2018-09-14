@@ -2,7 +2,7 @@
 
 To see the live website, please go to [http://lident.blebli.de/](http://lident.blebli.de/).
 
-This is a Web App for language identification that without further configuration, will run locally when calling <code>runserver.py</code>.
+This is a Web App for language identification that without further configuration, will run locally when calling <code>runserver.py</code>. Then open a browser and go to http://localhost:4242/ .
 
 Please be sure you have all Python 3 packages installed from <code>requirements.txt</code>.
 
