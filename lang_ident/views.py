@@ -32,7 +32,7 @@ def identifyLang():
     txt = txt.split(' ')
 
     t1 = time.time()
-    lang = li.identify(txt)
-    print('Took', time.time()-t1)
+    lang = li.CLASSIFIER.identify(txt)
+    print('Took', time.time()-t1, 'seconds')
 
     return json.dumps({'language': lang})
