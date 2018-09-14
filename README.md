@@ -43,4 +43,4 @@ For Turkish we have two sentences mistaken for English. This is because the sent
 *Nerelisin?*
 and
 *Tom ve Mary yoktu.*
-Italian is mistaken for Spanish, since the two languages are very similar.
+The drop in accuracy for Italian is because Italian is mistaken for Spanish, since the two languages are very similar.
